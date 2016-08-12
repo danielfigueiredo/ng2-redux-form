@@ -10,6 +10,7 @@ module.exports =
       libraryTarget: undefined,
       path: path.resolve(__dirname, 'dist'),
     }),
+    devtool: 'inline-source-map',
     externals: null,
     plugins: require('./webpack/plugins'),
   });
