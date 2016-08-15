@@ -15,7 +15,7 @@ import { NgRedux, select } from 'ng2-redux';
 import { combineReducers } from 'redux';
 
 import { Connect } from '../../source/connect';
-import { NgFormArray } from '../../source/ng-form-array';
+import { NgReduxGroup, NgReduxControl } from '../../source/directives';
 import { composeReducers } from '../../source/compose-reducers';
 import { defaultFormReducer } from '../../source/form-reducer';
 import { provideFormConnect } from '../../source/configure';
@@ -26,40 +26,46 @@ import { logger } from '../../source/tests.utilities';
   template: `
     <div>
       <h3>Form</h3>
-      <form connect="form1">
-        <input ngControl ngModel name="textExample" type="text" />
-        <input ngControl ngModel name="checkboxExample" type="checkbox" />
-        <div *ngFormArray="let index of 'multiEntryExample'">
-          {{ index}}
-          <input ngControl ngModel [name]="'multiEntryExample.' + index + '.numberExample'" type="number"/>
-          <select ngControl ngModel [name]="'multiEntryExample.' + index + '.dropdownExample'">
-            <option value="one">One</option>
-            <option value="two">Two</option>
-            <option value="three">Three</option>
-          </select>
+      <div ngReduxGroup="myTestGroup">
+        <div ngReduxGroup="mmyTestSubGroup">
+          <input type="text" ngModel ngReduxControl="myTestSubInput"/>  
         </div>
-        <button (click)="addRow()">Add</button>
-      </form>
-      <div>
-        <h3>Redux state</h3>
-        <div class="form-values">
-          <div>
-            Text example
-            <span>{{textExample | async}}</span>
-          </div>
-          <div>
-            Checkbox
-            <span>{{checkboxExample | async}}</span>
-          </div>
-          <div>
-            Dropdown
-            <span>{{stringify((multiEntryExample | async))}}</span>
-          </div>
-        </div>
+        <input type="text" ngModel ngReduxControl="myTestInput"/>
       </div>
+      <!--<form connect="form1">-->
+        <!--<input ngControl ngModel name="textExample" type="text" />-->
+        <!--<input ngControl ngModel name="checkboxExample" type="checkbox" />-->
+        <!--<div *ngFormArray="let index of 'multiEntryExample'">-->
+          <!--{{ index}}-->
+          <!--<input ngControl ngModel [name]="'multiEntryExample.' + index + '.numberExample'" type="number"/>-->
+          <!--<select ngControl ngModel [name]="'multiEntryExample.' + index + '.dropdownExample'">-->
+            <!--<option value="one">One</option>-->
+            <!--<option value="two">Two</option>-->
+            <!--<option value="three">Three</option>-->
+          <!--</select>-->
+        <!--</div>-->
+        <!--<button (click)="addRow()">Add</button>-->
+      <!--</form>-->
+      <!--<div>-->
+        <!--<h3>Redux state</h3>-->
+        <!--<div class="form-values">-->
+          <!--<div>-->
+            <!--Text example-->
+            <!--<span>{{textExample | async}}</span>-->
+          <!--</div>-->
+          <!--<div>-->
+            <!--Checkbox-->
+            <!--<span>{{checkboxExample | async}}</span>-->
+          <!--</div>-->
+          <!--<div>-->
+            <!--Dropdown-->
+            <!--<span>{{stringify((multiEntryExample | async))}}</span>-->
+          <!--</div>-->
+        <!--</div>-->
+      <!--</div>-->
     </div>
   `,
-  directives: [Connect, NgFormArray],
+  directives: [NgReduxGroup, NgReduxControl],
   styles: [require('./index.css')]
 })
 export class FormExample {
