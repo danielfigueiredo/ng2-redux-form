@@ -15,6 +15,7 @@ export interface AbstractStore<RootState> {
 }
 
 export const FORM_CHANGED = '@@ng2-redux-form/FORM_CHANGED';
+export const META_CHANGED = '@@ng2-redux-form/META_CHANGED';
 
 @Injectable()
 export class FormStore<RootState> {

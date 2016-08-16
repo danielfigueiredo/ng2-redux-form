@@ -8,7 +8,6 @@ import {
   provideForms,
   REACTIVE_FORM_DIRECTIVES,
   disableDeprecatedForms,
-  FormGroup,
 } from '@angular/forms';
 import { Component, provide } from '@angular/core';
 import { bootstrap } from '@angular/platform-browser-dynamic';
@@ -32,18 +31,20 @@ import { logger } from '../../source/tests.utilities';
     <div>
       <h3>Form</h3>
       <form connect="form1">
-        <input ngControl ngModel name="textExample" type="text" />
-        <input ngControl ngModel name="checkboxExample" type="checkbox" />
-        <template connectArray let-index connectArrayOf="arrayExample">
+        <div ngModelGroup="groupExample">
+          <input ngModel name="textExample" type="text" />
+          <input ngModel name="checkboxExample" type="checkbox" />
+        </div>
+        <div *connectArray="let index of 'arrayExample'">
           <div [ngModelGroup]="index">
-            <input ngControl ngModel name="numberExample" type="number" />
-            <select ngControl ngModel name="dropdownExample">
+            <input ngModel name="numberExample" type="number" />
+            <select ngModel name="dropdownExample">
               <option value="one">One</option>
               <option value="two">Two</option>
               <option value="three">Three</option>
             </select>
           </div>
-        </template>
+        </div>
         <button (click)="addRow()">Add</button>
       </form>
       <div>
@@ -51,11 +52,11 @@ import { logger } from '../../source/tests.utilities';
         <div class="form-values">
           <div>
             Text example
-            <span>{{textExample | async}}</span>
+            <span>{{(groupExample | async).textExample}}</span>
           </div>
           <div>
             Checkbox
-            <span>{{checkboxExample | async}}</span>
+            <span>{{(groupExample | async).checkboxExample}}</span>
           </div>
           <div class="arrays">
             Array
@@ -85,8 +86,7 @@ export class FormExample {
   // These are just for reproducing the values inside the 'Form values' panel
   // and are not required to actually hook up the form. We are just pulling
   // the values back out of Redux to show them changing as the form changes.
-  @select(s => s.form1.textExample) private textExample;
-  @select(s => s.form1.checkboxExample) private checkboxExample;
+  @select(s => s.form1.groupExample) private groupExample;
   @select(s => s.form1.arrayExample) private arrayExample;
 
   constructor(private ngRedux: NgRedux<AppState>) {}
@@ -148,8 +148,10 @@ export class Example {}
 
 interface AppState {
   form1?: {
-    textExample?: string;
-    checkboxExample?: boolean;
+    groupExample?: {
+      textExample?: string;
+      checkboxExample?: boolean;
+    },
     arrayExample?: {
       numberExample?: number,
       dropdownExample?: string;
@@ -159,8 +161,10 @@ interface AppState {
 }
 
 const form1 = {
-  textExample: 'Text example',
-  checkboxExample: true,
+  groupExample: {
+    textExample: 'Text example',
+    checkboxExample: true
+  },
   arrayExample: [
     {
       numberExample: 1,

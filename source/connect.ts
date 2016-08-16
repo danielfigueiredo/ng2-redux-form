@@ -8,6 +8,9 @@ import {
   NgForm,
   NgModel,
   NgControl,
+  FormGroup,
+  FormArray,
+  AbstractControl,
 } from '@angular/forms';
 import {
   scheduleMicroTask,
@@ -16,7 +19,6 @@ import {
 import { Subscription } from 'rxjs';
 import 'rxjs/add/operator/debounceTime';
 
-import { FormException } from './form-exception';
 import { FormStore } from './form-store';
 import { State } from './state';
 
@@ -35,7 +37,7 @@ export class Connect<RootState> {
     private store: FormStore<RootState>,
     private form: NgForm
   ) {
-    this.stateSubscription = this.store.subscribe(state => {
+    this.stateSubscription = this.store.subscribe(() => {
       this.resetState();
     });
   }
@@ -71,11 +73,13 @@ export class Connect<RootState> {
     }
   }
 
-  private ngAfterViewInit() {
+  ngAfterViewInit() {
     this.resetState();
 
     scheduleMicroTask(() => {
-      this.formSubscription = this.form.valueChanges.debounceTime(0).subscribe(values => this.publish(values));
+      this.formSubscription = this.form.valueChanges.debounceTime(0).subscribe(
+        values => this.publish(values)
+      );
     });
   }
 
@@ -91,7 +95,47 @@ export class Connect<RootState> {
     });
   }
 
+  private generateControlInfo(control: AbstractControl): any {
+    return {
+      status: control.status,
+      valid: control.valid,
+      invalid: control.invalid,
+      touched: control.touched,
+      untouched: control.untouched,
+      pristine: control.pristine,
+      dirty: control.dirty,
+      errors: control.errors
+    };
+  }
+
+  private generateFormMetadata(control: AbstractControl, key, metaFormData = {}): any {
+    if (control instanceof FormGroup) {
+      Object.keys((<FormGroup> control).controls)
+        .forEach(
+          entry => {
+            if (metaFormData[key]) {
+              metaFormData[key] = Object.assign(
+                metaFormData[key],
+                this.generateFormMetadata(control.controls[entry], entry)
+              );
+            } else {
+              metaFormData[entry] = this.generateFormMetadata(control.controls[entry], entry);
+            }
+          }
+        );
+    } else if (control instanceof FormArray) {
+      metaFormData = [];
+      (<FormArray> control).controls.forEach(
+        (control, index) => metaFormData[index] = this.generateFormMetadata(control, null)
+      );
+    }
+    metaFormData['meta'] = this.generateControlInfo(control);
+    return metaFormData;
+  }
+  
   protected publish(value) {
+    const meta = this.generateFormMetadata(this.form.form, this.connect);
+    console.log(meta);
     this.store.valueChanged(this.path, this.form, value);
   }
 

@@ -1,16 +1,11 @@
 import {
-  Iterable,
-  Map,
-  fromJS
+  Iterable
 } from 'immutable';
 
-import { Reducer } from 'redux';
-
-import { FormException } from './form-exception';
 
 import {
   FORM_CHANGED,
-  FormStore,
+  META_CHANGED,
 } from './form-store';
 
 import { State } from './state';
@@ -22,11 +17,18 @@ export const defaultFormReducer = <RootState>(initialState?: RootState | Iterabl
         return State.assign(
           state,
           action.payload.path,
-          action.payload.value);
+          action.payload.value
+        );
+      case META_CHANGED:
+        return State.assign(
+          state,
+          action.payload.path,
+          action.payload.value
+        );
       default:
         return state;
     }
-  }
+  };
 
   return reducer;
 };

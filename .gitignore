@@ -43,3 +43,6 @@ jspm_packages
 # Build output
 .awcache
 dist
+
+# Webstorm indexes
+.idea
